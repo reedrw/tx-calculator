@@ -18,7 +18,8 @@
 -- '(((((:)))))' = 127 (31st prime)
 --
 -- Numbers constellate as normal factor strings, i.e. 55 (5 x 11) is tic xenotated as '((:))(((:)))'
-import Data.List
+--
+import System.Environment
 import Data.List hiding (union)
 import Data.Maybe
 import Data.List.Ordered
@@ -26,7 +27,24 @@ import Data.List.Ordered
 -- Just here because otherwise my editor complains
 main :: IO ()
 main = do
-  putStrLn "Hello, World!"
+  args <- getArgs
+  case (args !! 0) of
+    "--help" -> do
+      putStrLn "Usage: tx <number>"
+      putStrLn "Converts a number to tic xenotation"
+      putStrLn ""
+      putStrLn "Options:"
+      putStrLn " -h, --help    Show this help message and exit"
+      putStrLn " -d, --decode  Decode a tic xenotation into decimal"
+      putStrLn "Examples:"
+      putStrLn "  tx 14"
+      putStrLn "  tx -d '((:))(((:)))'"
+    "-d" -> do
+      putStrLn $ show $ unxenotate $ args !! 1
+    "--decode" -> do
+      putStrLn $ show $ unxenotate $ args !! 1
+    _ -> do
+      putStrLn $ xenotate $ read $ args !! 0
 
 -- Given a number, return a list of its prime factors
 primeFactors :: Int -> [Int]
@@ -75,15 +93,15 @@ data Implex =  Num Int
 
 lexer :: String -> [Token]
 lexer [] = []
+lexer ('(':xs) = LPar  : lexer xs
+lexer (')':xs) = RPar  : lexer xs
 lexer (':':xs) = Colon : lexer xs
-lexer ('(':xs) = LPar : lexer xs
-lexer (')':xs) = RPar : lexer xs
-lexer (x:xs) = Error x : lexer xs -- Invalid character
+lexer (x:xs)   = Error x : lexer xs -- Invalid character
 
 sr :: [Token] -> [Token] -> [Token]
-sr (Colon:xs) q = sr (ParsedImplex (Num 2) : xs) q
-sr (ParsedImplex (Num a): ParsedImplex (Num b):xs) q = sr (ParsedImplex (Num (a * b)) : xs) q   -- Multiply adjacencies
-sr (RPar: ParsedImplex (Num a): LPar:xs) q = sr (ParsedImplex (Num (primes !! (a - 1))) : xs) q -- Prime implexion
+sr (Colon:xs) q = sr (ParsedImplex (Num 2):xs) q
+sr (ParsedImplex (Num a):ParsedImplex (Num b):xs) q = sr (ParsedImplex (Num $ a * b):xs) q   -- Multiply adjacencies
+sr (RPar:ParsedImplex (Num a):LPar:xs) q = sr (ParsedImplex (Num $ primes !! (a - 1)):xs) q  -- Prime implexion
 sr s [] = s
 sr s (i:q) = sr (i:s) q
 
