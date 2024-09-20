@@ -41,6 +41,11 @@
           mkdir -p $out/bin
           cp ./tx $out/bin
         '';
+        meta = with pkgs.lib; {
+          description = "A simple Tic-Xenotation (TX) calculator";
+          mainProgram = "tx";
+          license = licenses.gpl3Plus;
+        };
       };
     });
   };
