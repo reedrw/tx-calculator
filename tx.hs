@@ -26,25 +26,35 @@ import Data.List.Ordered
 
 -- Just here because otherwise my editor complains
 main :: IO ()
-main = do
+main = let
+        helpMessage =
+          putStrLn "Usage: tx <number>" >>
+          putStrLn "Converts a number to tic xenotation" >>
+          putStrLn "" >>
+          putStrLn "Options:" >>
+          putStrLn " -h, --help    Show this help message and exit" >>
+          putStrLn " -d, --decode  Decode a tic xenotation into decimal" >>
+          putStrLn "Examples:" >>
+          putStrLn "  tx 14" >>
+          putStrLn "  tx -d '((:))(((:)))'"
+        encode args = putStrLn $ xenotate $ read $ args !! 1
+        decode args = case (length args) of
+          1 -> putStrLn "Error: No tic xenotation provided"
+          _ ->
+              putStrLn $ show $ unxenotate $ args !! 1
+        in do
   args <- getArgs
-  case (args !! 0) of
-    "--help" -> do
-      putStrLn "Usage: tx <number>"
-      putStrLn "Converts a number to tic xenotation"
-      putStrLn ""
-      putStrLn "Options:"
-      putStrLn " -h, --help    Show this help message and exit"
-      putStrLn " -d, --decode  Decode a tic xenotation into decimal"
-      putStrLn "Examples:"
-      putStrLn "  tx 14"
-      putStrLn "  tx -d '((:))(((:)))'"
-    "-d" -> do
-      putStrLn $ show $ unxenotate $ args !! 1
-    "--decode" -> do
-      putStrLn $ show $ unxenotate $ args !! 1
-    _ -> do
-      putStrLn $ xenotate $ read $ args !! 0
+  case (length args) of
+    0 -> helpMessage
+    _ -> case (args !! 0) of
+      "--help" -> do
+        helpMessage
+      "-d" -> do
+        decode args
+      "--decode" -> do
+        decode args
+      _ -> do
+        encode args
 
 -- Given a number, return a list of its prime factors
 primeFactors :: Int -> [Int]
