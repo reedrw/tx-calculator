@@ -19,7 +19,9 @@
 --
 -- Numbers constellate as normal factor strings, i.e. 55 (5 x 11) is tic xenotated as '((:))(((:)))'
 import Data.List
+import Data.List hiding (union)
 import Data.Maybe
+import Data.List.Ordered
 
 -- Just here because otherwise my editor complains
 main :: IO ()
@@ -36,8 +38,8 @@ primeFactors n =
 
 -- Infinite list of prime numbers
 primes :: [Int]
-primes = sieve [2..]
-  where sieve (p:xs) = p : sieve [x | x <- xs, x `mod` p /= 0]
+primes = 2 : minus [3..] (foldr (\p r-> p*p : union [p*p+p, p*p+2*p..] r)
+                                 [] primes)
 
 -- Procedure to convert a number to its tic xenotation
 -- In this example we'll show how to convert 14 to its tic xenotation :(::)
