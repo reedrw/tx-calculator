@@ -25,7 +25,8 @@
       };
     });
 
-    packages = genSystems (system: let pkgs = pkgsFor system; in {
+    packages = genSystems (system: let pkgs = pkgsFor system; in rec {
+      default = tx-calculator;
       tx-calculator = pkgs.stdenv.mkDerivation {
         name = "tx-calculator";
         src = ./.;
