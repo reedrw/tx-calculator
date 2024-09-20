@@ -37,7 +37,7 @@ main = let
           putStrLn "Examples:" >>
           putStrLn "  tx 14" >>
           putStrLn "  tx -d '((:))(((:)))'"
-        encode args = putStrLn $ xenotate $ read $ args !! 1
+        encode args = putStrLn $ xenotate $ read $ args !! 0
         decode args = case (length args) of
           1 -> putStrLn "Error: No tic xenotation provided"
           _ ->
