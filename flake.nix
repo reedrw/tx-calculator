@@ -1,5 +1,5 @@
 {
-  description = "A very basic flake";
+  description = "A simple Tic-Xenotation (TX) calculator";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
