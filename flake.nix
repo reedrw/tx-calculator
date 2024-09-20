@@ -6,31 +6,42 @@
   };
 
   outputs = { self, nixpkgs }: let
-    pkgs = nixpkgs.legacyPackages.x86_64-linux;
+    genSystems = nixpkgs.lib.genAttrs [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
+    pkgsFor = system: nixpkgs.legacyPackages."${system}";
   in {
-    devShells.x86_64-linux.default = pkgs.mkShell {
-      name = "tx-calculator";
-      buildInputs = with pkgs; [
-        (haskellPackages.ghcWithPackages (pkgs: with pkgs; [
-          haskellPackages.data-ordlist
-        ]))
-      ];
-    };
-    packages.x86_64-linux.tx-calculator = pkgs.stdenv.mkDerivation {
-      name = "tx-calculator";
-      src = ./.;
-      buildInputs = with pkgs; [
-        (haskellPackages.ghcWithPackages (pkgs: with pkgs; [
-          haskellPackages.data-ordlist
-        ]))
-      ];
-      buildPhase = ''
-        ghc ./tx.hs -o tx
-      '';
-      installPhase = ''
-        mkdir -p $out/bin
-        cp ./tx $out/bin
-      '';
-    };
+    devShells = genSystems (system: let pkgs = pkgsFor system; in {
+      default = pkgs.mkShell {
+        name = "tx-calculator";
+        buildInputs = with pkgs; [
+          (haskellPackages.ghcWithPackages (pkgs: with pkgs; [
+            haskellPackages.data-ordlist
+          ]))
+        ];
+      };
+    });
+
+    packages = genSystems (system: let pkgs = pkgsFor system; in {
+      tx-calculator = pkgs.stdenv.mkDerivation {
+        name = "tx-calculator";
+        src = ./.;
+        buildInputs = with pkgs; [
+          (haskellPackages.ghcWithPackages (pkgs: with pkgs; [
+            haskellPackages.data-ordlist
+          ]))
+        ];
+        buildPhase = ''
+          ghc ./tx.hs -o tx
+        '';
+        installPhase = ''
+          mkdir -p $out/bin
+          cp ./tx $out/bin
+        '';
+      };
+    });
   };
 }
