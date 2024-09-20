@@ -17,7 +17,7 @@
     devShells = genSystems (system: let pkgs = pkgsFor system; in {
       default = pkgs.mkShell {
         name = "tx-calculator";
-        buildInputs = with pkgs; [
+        packages = with pkgs; [
           (haskellPackages.ghcWithPackages (pkgs: with pkgs; [
             haskellPackages.data-ordlist
           ]))
