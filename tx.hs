@@ -1,3 +1,9 @@
+import System.Environment
+import Data.List hiding (union)
+import Data.Maybe
+import Data.List.Ordered
+import Data.Char
+
 -- This is program takes in a number and converts it into Daniel C. Barker's
 -- tic xenotation.
 --
@@ -18,43 +24,32 @@
 -- '(((((:)))))' = 127 (31st prime)
 --
 -- Numbers constellate as normal factor strings, i.e. 55 (5 x 11) is tic xenotated as '((:))(((:)))'
---
-import System.Environment
-import Data.List hiding (union)
-import Data.Maybe
-import Data.List.Ordered
 
--- Just here because otherwise my editor complains
 main :: IO ()
 main = let
-        helpMessage =
-          putStrLn "Usage: tx <number>" >>
-          putStrLn "Converts a number to tic xenotation" >>
-          putStrLn "" >>
-          putStrLn "Options:" >>
-          putStrLn " -h, --help    Show this help message and exit" >>
-          putStrLn " -d, --decode  Decode a tic xenotation into decimal" >>
-          putStrLn "Examples:" >>
-          putStrLn "  tx 14" >>
-          putStrLn "  tx -d '((:))(((:)))'"
-        encode args = putStrLn $ xenotate $ read $ args !! 0
-        decode args = case (length args) of
-          1 -> putStrLn "Error: No tic xenotation provided"
-          _ ->
-              putStrLn $ show $ unxenotate $ args !! 1
-        in do
+  helpMessage =
+    putStrLn "Usage: tx <number>" >>
+    putStrLn "Converts a number to or from tic xenotation" >>
+    putStrLn "" >>
+    putStrLn "Options:" >>
+    putStrLn "  -h, --help    Show this help message and exit" >>
+    putStrLn "" >>
+    putStrLn "Examples:" >>
+    putStrLn "  tx 14" >>
+    putStrLn "  tx '((:))(((:)))'"
+  encode args@(x:xs) = if foldl (\acc x -> acc && x) True $ map isDigit x
+    then putStrLn $ xenotate $ read $ args !! 0
+    else error "Input is not a valid number"
+  decode args = putStrLn $ show $ unxenotate $ args !! 0
+  in do
   args <- getArgs
   case (length args) of
     0 -> helpMessage
     _ -> case (args !! 0) of
-      "--help" -> do
-        helpMessage
-      "-d" -> do
-        decode args
-      "--decode" -> do
-        decode args
-      _ -> do
-        encode args
+      "-h"     -> helpMessage
+      "--help" -> helpMessage
+      (x:xs) | x == '(' || x == ':' || x == ')' -> decode args
+      _ -> encode args
 
 -- Given a number, return a list of its prime factors
 primeFactors :: Int -> [Int]
@@ -69,13 +64,14 @@ primes :: [Int]
 primes = 2 : minus [3..] (foldr (\p r-> p*p : union [p*p+p, p*p+2*p..] r)
                                  [] primes)
 
--- Procedure to convert a number to its tic xenotation
+-- Procedure to convert a number to its TX representation
 -- In this example we'll show how to convert 14 to its tic xenotation :(::)
 -- 1. Find all its prime factors.     primeFactors 14 = [2, 7]
 -- 2. If the list starts with 2, put a colon in the tic xenotation.
 -- 3. for each prime factor that is not 2, find the index of the prime factor in the list of primes. 7 is the 4th prime
 -- 4. Surround with brackets, and convert the prime factors of the index into xenotation recursively.
 
+-- Convert a list of prime factors into TX
 xenotate' :: [Int] -> String
 xenotate' [] = ""
 xenotate' (x:xs)  | x == 2 = ':' : xenotate' xs
