@@ -37,19 +37,21 @@ main = let
     putStrLn "Examples:" >>
     putStrLn "  tx 14" >>
     putStrLn "  tx '((:))(((:)))'"
-  encode args@(x:xs) = if foldl (\acc x -> acc && x) True $ map isDigit x
-    then putStrLn $ xenotate $ read $ args !! 0
-    else error "Input is not a valid number"
-  decode args = putStrLn $ show $ unxenotate $ args !! 0
+  encode arg = putStrLn $ xenotate $ read arg
+  decode arg = putStrLn $ show $ unxenotate arg
   in do
   args <- getArgs
   case (length args) of
     0 -> helpMessage
-    _ -> case (args !! 0) of
-      "-h"     -> helpMessage
-      "--help" -> helpMessage
-      (x:xs) | x == '(' || x == ':' || x == ')' -> decode args
-      _ -> encode args
+    _ -> case arg of
+        (x:xs) | (x:xs) == "-h"
+              || (x:xs) == "--help" -> helpMessage
+        (x:xs) | x == '('
+              || x == ':'
+              || x == ')' -> decode arg
+        (x:xs) | all isDigit (x:xs) -> encode arg
+        _ -> error "Input is not a valid number"
+        where arg = args !! 0
 
 -- Given a number, return a list of its prime factors
 primeFactors :: Int -> [Int]
@@ -74,11 +76,11 @@ primes = 2 : minus [3..] (foldr (\p r-> p*p : union [p*p+p, p*p+2*p..] r)
 -- Convert a list of prime factors into TX
 xenotate' :: [Int] -> String
 xenotate' [] = ""
-xenotate' (x:xs)  | x == 2 = ':' : xenotate' xs
-                  | otherwise = '(' : inner ++ ")" ++ xenotate' xs
-                  where inner = let
-                         newPrime = (fromJust $ elemIndex x primes) + 1
-                         in xenotate newPrime
+xenotate' (x:xs) | x == 2 = ':' : xenotate' xs
+                 | otherwise = '(' : inner ++ ")" ++ xenotate' xs
+                 where inner = let
+                        newPrime = (fromJust $ elemIndex x primes) + 1
+                        in xenotate newPrime
 
 xenotate :: Int -> String
 xenotate 0 = "((-P)):" -- 0 is a special case that's written like this for some reason (wtf Nick)
