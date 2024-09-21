@@ -1,3 +1,5 @@
+#!/usr/bin/env runhaskell
+
 import System.Environment
 import Data.List hiding (union)
 import Data.Maybe
