@@ -1,9 +1,8 @@
 #!/usr/bin/env runhaskell
 
 import System.Environment
-import Data.List hiding (union)
+import Data.List
 import Data.Maybe
-import Data.List.Ordered
 import Data.Char
 import Data.Numbers.Primes
 
