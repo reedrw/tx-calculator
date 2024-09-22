@@ -20,6 +20,7 @@
         packages = with pkgs; [
           (haskellPackages.ghcWithPackages (pkgs: with pkgs; [
             haskellPackages.data-ordlist
+            haskellPackages.primes
           ]))
         ];
       };
@@ -33,6 +34,7 @@
         buildInputs = with pkgs; [
           (haskellPackages.ghcWithPackages (pkgs: with pkgs; [
             haskellPackages.data-ordlist
+            haskellPackages.primes
           ]))
         ];
         buildPhase = ''

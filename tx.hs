@@ -5,6 +5,7 @@ import Data.List hiding (union)
 import Data.Maybe
 import Data.List.Ordered
 import Data.Char
+import Data.Numbers.Primes
 
 -- This is program takes in a number and converts it into Daniel C. Barker's
 -- tic xenotation.
@@ -55,19 +56,6 @@ main = let
         _ -> error "Input is not a valid number"
         where arg = args !! 0
 
--- Given a number, return a list of its prime factors
-primeFactors :: Int -> [Int]
-primeFactors n =
-  case factors of
-    [] -> [n]
-    _  -> factors ++ primeFactors (n `div` (head factors))
-  where factors = take 1 $ filter (\x -> (n `mod` x) == 0) [2 .. n-1]
-
--- Infinite list of prime numbers
-primes :: [Int]
-primes = 2 : minus [3..] (foldr (\p r-> p*p : union [p*p+p, p*p+2*p..] r)
-                                 [] primes)
-
 -- Procedure to convert a number to its TX representation
 -- In this example we'll show how to convert 14 to its tic xenotation :(::)
 -- 1. Find all its prime factors.     primeFactors 14 = [2, 7]
@@ -85,9 +73,9 @@ xenotate' (x:xs) | x == 2 = ':' : xenotate' xs
                         in xenotate newPrime
 
 xenotate :: Int -> String
-xenotate 0 = "((-P)):" -- 0 is a special case that's written like this for some reason (wtf Nick)
-xenotate 1 = "(-P):" -- 1 is also a special case, see above
-xenotate n = xenotate' $ primeFactors n
+xenotate n | n == 0 = "((-P)):" -- 0 is a special case that's written like this for some reason (wtf Nick)
+           | n == 1 = "(-P):"   -- 1 is also a special case, see above
+           | otherwise = xenotate' $ primeFactors n
 
 
 -- We can do the reverse of this by parsing the string and converting it back to a number
