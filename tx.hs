@@ -55,6 +55,11 @@ main = let
         _ -> error "Input is not a valid number"
         where arg = args !! 0
 
+-- Since TX indexes primes starting from 1, adding something to index 0 will
+-- make the index of the prime factors match their TX representation
+primes' :: [Int]
+primes' = 1:primes
+
 -- Procedure to convert a number to its TX representation
 -- In this example we'll show how to convert 14 to its tic xenotation :(::)
 -- 1. Find all its prime factors.     primeFactors 14 = [2, 7]
@@ -66,15 +71,15 @@ main = let
 xenotate' :: [Int] -> String
 xenotate' [] = ""
 xenotate' (x:xs) | x == 2 = ':' : xenotate' xs
-                 | otherwise = '(' : inner ++ ")" ++ xenotate' xs
+                 | otherwise = '(' : inner ++ ')' : xenotate' xs
                  where inner = let
-                        newPrime = (fromJust $ elemIndex x primes) + 1
-                        in xenotate newPrime
+                        n = fromJust $ elemIndex x primes'
+                        in xenotate' $ primeFactors n
 
 xenotate :: Int -> String
 xenotate n | n == 0 = "((-P)):" -- 0 is a special case that's written like this for some reason (wtf Nick)
            | n == 1 = "(-P):"   -- 1 is also a special case, see above
-           | otherwise = xenotate' $ primeFactors n
+           | True   = xenotate' $ primeFactors n
 
 
 -- We can do the reverse of this by parsing the string and converting it back to a number
@@ -98,7 +103,7 @@ lexer (x:xs)   = Error x : lexer xs -- Invalid character
 sr :: [Token] -> [Token] -> [Token]
 sr (Colon:xs) q = sr (ParsedImplex (Num 2):xs) q
 sr (ParsedImplex (Num a):ParsedImplex (Num b):xs) q = sr (ParsedImplex (Num $ a * b):xs) q   -- Multiply adjacencies
-sr (RPar:ParsedImplex (Num a):LPar:xs) q = sr (ParsedImplex (Num $ primes !! (a - 1)):xs) q  -- Prime implexion
+sr (RPar:ParsedImplex (Num a):LPar:xs) q = sr (ParsedImplex (Num $ primes' !! a):xs) q  -- Prime implexion
 sr s [] = s
 sr s (i:q) = sr (i:s) q
 
