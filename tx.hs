@@ -71,7 +71,7 @@ primes' = 1:primes
 xenotate' :: [Int] -> String
 xenotate' [] = ""
 xenotate' (x:xs) | x == 2 = ':' : xenotate' xs
-                 | otherwise = '(' : inner ++ ')' : xenotate' xs
+                 | True   = '(' : inner ++ ')' : xenotate' xs
                  where inner = let
                         n = fromJust $ elemIndex x primes'
                         in xenotate' $ primeFactors n
