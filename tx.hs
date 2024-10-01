@@ -46,14 +46,14 @@ main = let
   case (length args) of
     0 -> helpMessage
     _ -> case arg of
-        (x:xs) | (x:xs) == "-h"
-              || (x:xs) == "--help" -> helpMessage
-        (x:xs) | x == '('
-              || x == ':'
-              || x == ')' -> decode arg
-        (x:xs) | all isDigit (x:xs) -> encode arg
-        _ -> error "Input is not a valid number"
-        where arg = args !! 0
+      (x:xs) | (x:xs) == "-h"
+            || (x:xs) == "--help" -> helpMessage
+      (x:xs) | x == '('
+            || x == ':'
+            || x == ')' -> decode arg
+      (x:xs) | all isDigit (x:xs) -> encode arg
+      _ -> error "Input is not a valid number"
+      where arg = args !! 0
 
 -- Since TX indexes primes starting from 1, adding something to index 0 will
 -- make the index of the prime factors match their TX representation
