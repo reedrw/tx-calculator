@@ -4,7 +4,8 @@ import System.Environment
 import Data.List
 import Data.Maybe
 import Data.Char
-import Data.Numbers.Primes
+import Math.NumberTheory.Primes
+import Math.NumberTheory.Primes.Counting
 
 -- This is program takes in a number and converts it into Daniel C. Barker's
 -- tic xenotation.
@@ -58,7 +59,15 @@ main = let
 -- Since TX indexes primes starting from 1, adding something to index 0 will
 -- make the index of the prime factors match their TX representation
 primes' :: [Int]
-primes' = 1:primes
+primes' = 1:map unPrime (primes :: [Prime Int])
+
+primeFactors :: Int -> [Int]
+primeFactors n = let
+  initial = map (\x -> unPrime $ fst x) $ factorise (n :: Int)
+  next = foldl' (\acc x -> acc `div` x) n initial
+                  in if next == 1
+                     then initial
+                     else initial ++ primeFactors next
 
 -- Procedure to convert a number to its TX representation
 -- In this example we'll show how to convert 14 to its tic xenotation :(::)
@@ -103,7 +112,7 @@ lexer (x:xs)   = Error x : lexer xs -- Invalid character
 sr :: [Token] -> [Token] -> [Token]
 sr (Colon:xs) q = sr (ParsedImplex (Num 2):xs) q
 sr (ParsedImplex (Num a):ParsedImplex (Num b):xs) q = sr (ParsedImplex (Num $ a * b):xs) q   -- Multiply adjacencies
-sr (RPar:ParsedImplex (Num a):LPar:xs) q = sr (ParsedImplex (Num $ primes' !! a):xs) q  -- Prime implexion
+sr (RPar:ParsedImplex (Num a):LPar:xs) q = sr (ParsedImplex (Num $ fromIntegral $ unPrime $ nthPrime a):xs) q  -- Prime implexion
 sr s [] = s
 sr s (i:q) = sr (i:s) q
 

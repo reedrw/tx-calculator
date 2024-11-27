@@ -19,7 +19,7 @@
         name = "tx-calculator";
         packages = with pkgs; [
           (haskellPackages.ghcWithPackages (pkgs: with pkgs; [
-            haskellPackages.primes
+            haskellPackages.arithmoi
           ]))
         ];
       };
@@ -32,7 +32,7 @@
         src = ./.;
         buildInputs = with pkgs; [
           (haskellPackages.ghcWithPackages (pkgs: with pkgs; [
-            haskellPackages.primes
+            haskellPackages.arithmoi
           ]))
         ];
         buildPhase = ''
