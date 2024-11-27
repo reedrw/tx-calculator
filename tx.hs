@@ -67,7 +67,7 @@ primeFactors n = let
   next = foldl' (\acc x -> acc `div` x) n initial
                   in if next == 1
                      then initial
-                     else initial ++ primeFactors next
+                     else sort $ initial ++ primeFactors next
 
 -- Procedure to convert a number to its TX representation
 -- In this example we'll show how to convert 14 to its tic xenotation :(::)
