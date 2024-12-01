@@ -36,12 +36,14 @@ main = let
     putStrLn "" >>
     putStrLn "Options:" >>
     putStrLn "  -h, --help    Show this help message and exit" >>
+    putStrLn "  -f, --factor  Show the prime factors of a number" >>
     putStrLn "" >>
     putStrLn "Examples:" >>
     putStrLn "  tx 14" >>
     putStrLn "  tx '((:))(((:)))'"
   encode arg = putStrLn $ xenotate $ read arg
   decode arg = putStrLn $ show $ unxenotate arg
+  factor arg = putStrLn $ show $ primeFactors $ read arg
   in do
   args <- getArgs
   case (length args) of
@@ -49,6 +51,8 @@ main = let
     _ -> case arg of
       (x:xs) | (x:xs) == "-h"
             || (x:xs) == "--help" -> helpMessage
+      (x:xs) | (x:xs) == "-f"
+            || (x:xs) == "--factor" -> factor $ args !! 1
       (x:xs) | x == '('
             || x == ':'
             || x == ')' -> decode arg
