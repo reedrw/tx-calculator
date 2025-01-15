@@ -2,20 +2,15 @@
   description = "A simple Tic-Xenotation (TX) calculator";
 
   inputs = {
+    flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
   };
 
-  outputs = { self, nixpkgs }: let
-    genSystems = nixpkgs.lib.genAttrs [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
-    pkgsFor = system: nixpkgs.legacyPackages."${system}";
-  in {
-    devShells = genSystems (system: let pkgs = pkgsFor system; in {
-      default = pkgs.mkShell {
+  outputs = inputs@{ flake-parts, ... }: flake-parts.lib.mkFlake { inherit inputs; }
+  {
+    systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin" ];
+    perSystem = { config, self', inputs', pkgs, system, ... }: {
+      devShells.default = pkgs.mkShell {
         name = "tx-calculator";
         packages = with pkgs; [
           (haskellPackages.ghcWithPackages (pkgs: with pkgs; [
@@ -23,31 +18,11 @@
           ]))
         ];
       };
-    });
 
-    packages = genSystems (system: let pkgs = pkgsFor system; in rec {
-      default = tx-calculator;
-      tx-calculator = pkgs.stdenv.mkDerivation {
-        name = "tx-calculator";
-        src = ./.;
-        buildInputs = with pkgs; [
-          (haskellPackages.ghcWithPackages (pkgs: with pkgs; [
-            haskellPackages.arithmoi
-          ]))
-        ];
-        buildPhase = ''
-          ghc ./tx.hs -o tx
-        '';
-        installPhase = ''
-          mkdir -p $out/bin
-          cp ./tx $out/bin
-        '';
-        meta = with pkgs.lib; {
-          description = "A simple Tic-Xenotation (TX) calculator";
-          mainProgram = "tx";
-          license = licenses.gpl3Plus;
-        };
+      packages = {
+        default = self'.packages.tx-calculator;
+        tx-calculator = pkgs.callPackage ./package.nix { };
       };
-    });
+    };
   };
 }
